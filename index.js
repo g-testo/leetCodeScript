@@ -24,9 +24,6 @@ const getLeetCodeStats = (accountNameArr) => {
         }`;
     }
     queries += "}";
-
-    console.log(queries);
-
     fetch("https://leetcode.com/graphql", {
         method: "POST",
         headers: {
@@ -38,13 +35,19 @@ const getLeetCodeStats = (accountNameArr) => {
     })
         .then((res) => res.json())
         .then((response) => {
-            console.log(response);
-            // let { data } = response;
-            // let recentProblems = data.recentSubmissionList;
-            // let stats = data.matchedUser.submitStats.acSubmissionNum;
-
-            // console.log(recentProblems);
-            // console.log(stats);
+            let { data } = response;
+            let details = Array(accountNameArr.length)
+                .fill(0)
+                .map((_, i) => {
+                    let acceptedProblems = data["userRecentSubmissions" + i].filter(
+                        (sub) => sub.statusDisplay === "Accepted"
+                    );
+                    return {
+                        stats: data["userStats" + i],
+                        subs: acceptedProblems,
+                    };
+                });
+            console.log(details);
         });
 };
 
